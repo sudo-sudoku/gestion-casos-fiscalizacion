@@ -1,0 +1,33 @@
+{
+  "name": "sistema-dian-leticia-fiscalizacion",
+  "version": "3.6.0",
+  "description": "Sistema de Gestión de Casos de Fiscalización - DIAN Leticia (Versión 36 con datos reales)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-db": "node database/init-database.js",
+    "build": "node database/init-database.js"
+  },
+  "keywords": [
+    "dian",
+    "fiscalizacion",
+    "leticia",
+    "tributaria",
+    "gestion-casos"
+  ],
+  "author": "DIAN Leticia",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
