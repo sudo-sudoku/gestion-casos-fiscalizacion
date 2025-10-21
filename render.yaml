@@ -1,0 +1,16 @@
+services:
+  # A Docker web service
+  - type: web
+    name: dian-leticia-v36
+    runtime: node
+    plan: free
+    buildCommand: "./render-build.sh"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=2048
+    healthCheckPath: /api/health

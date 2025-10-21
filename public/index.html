@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAN Leticia - Sistema de Gestión de Casos de Fiscalización</title>
+    <link rel="stylesheet" href="styles.css">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo-placeholder">🏛️</div>
+                <h1>Sistema de Gestión de Casos</h1>
+                <h2>Fiscalización Tributaria</h2>
+                <p class="subtitle">DIAN - Dirección Seccional Leticia</p>
+                <p class="version">Versión 3.6</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" name="username" required autocomplete="username" placeholder="Ingrese su usuario">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Ingrese su contraseña">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+            <div class="login-footer">
+                <p class="help-text">Usuarios de prueba:</p>
+                <p class="help-text">• admin / admin123</p>
+                <p class="help-text">• maria.murillo / auditor123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla Principal de la Aplicación -->
+    <div id="appScreen" class="screen">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-logo">🏛️</div>
+                <div class="header-title">
+                    <h1>Gestión de Casos de Fiscalización</h1>
+                    <p>DIAN - Dirección Seccional Leticia</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span id="userInfo" class="user-info"></span>
+                <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <!-- Navegación -->
+        <nav class="app-nav">
+            <button class="nav-btn active" data-view="dashboard">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </button>
+            <button class="nav-btn" data-view="cases">
+                <span class="nav-icon">📁</span>
+                Casos
+            </button>
+            <button class="nav-btn" data-view="reports">
+                <span class="nav-icon">📈</span>
+                Reportes
+            </button>
+            <button class="nav-btn" data-view="users" id="usersNavBtn" style="display: none;">
+                <span class="nav-icon">👥</span>
+                Usuarios
+            </button>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="app-content">
+            <!-- Vista Dashboard -->
+            <div id="dashboardView" class="view active">
+                <h2>Panel de Control</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h3 id="totalCases">0</h3>
+                            <p>Total de Casos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="activeCases">0</h3>
+                            <p>Casos Activos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔒</div>
+                        <div class="stat-info">
+                            <h3 id="closedCases">0</h3>
+                            <p>Casos Cerrados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <h3 id="gestionPerceptiva">0</h3>
+                            <p>Gestión Perceptiva</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👤</div>
+                        <div class="stat-info">
+                            <h3 id="totalAuditors">0</h3>
+                            <p>Auditores</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3 id="totalAmount">$0</h3>
+                            <p>Monto Total</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Casos -->
+            <div id="casesView" class="view">
+                <div class="view-header">
+                    <h2>Gestión de Casos</h2>
+                    <button id="addCaseBtn" class="btn btn-primary" style="display: none;">
+                        <span>➕</span> Nuevo Caso
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filters-panel">
+                    <input type="text" id="searchInput" placeholder="Buscar por ID, NIT o Nombre..." class="search-input">
+                    <select id="programFilter" class="filter-select">
+                        <option value="">Todos los Programas</option>
+                    </select>
+                    <select id="taxTypeFilter" class="filter-select">
+                        <option value="">Todos los Impuestos</option>
+                    </select>
+                    <select id="auditorFilter" class="filter-select">
+                        <option value="">Todos los Auditores</option>
+                    </select>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">Todos los Estados</option>
+                        <option value="Activo">Activo</option>
+                        <option value="En Curso">En Curso</option>
+                        <option value="En Notificación">En Notificación</option>
+                        <option value="Cerrado">Cerrado</option>
+                        <option value="Evacuado">Evacuado</option>
+                    </select>
+                    <select id="gestionFilter" class="filter-select">
+                        <option value="">Gestión Perceptiva</option>
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+
+                <!-- Tabla de Casos -->
+                <div class="table-container">
+                    <table id="casesTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID Caso</th>
+                                <th>NIT</th>
+                                <th>Contribuyente</th>
+                                <th>Programa</th>
+                                <th>Impuesto</th>
+                                <th>Año Gravable</th>
+                                <th>Auditor</th>
+                                <th>G.P.</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="casesTableBody">
+                            <tr>
+                                <td colspan="10" class="text-center">Cargando casos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista Reportes -->
+            <div id="reportsView" class="view">
+                <h2>Reportes</h2>
+                <div class="reports-tabs">
+                    <button class="tab-btn active" data-report="inventory">Inventario por Programa</button>
+                    <button class="tab-btn" data-report="program">Detalle por Programa</button>
+                    <button class="tab-btn" data-report="auditor">Desempeño de Auditores</button>
+                </div>
+
+                <!-- Reporte de Inventario -->
+                <div id="inventoryReport" class="report-content active">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Programa</th>
+                                    <th>Total Casos</th>
+                                    <th>Gestión Perceptiva</th>
+                                    <th>Activos</th>
+                                    <th>Cerrados</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryReportBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">Cargando reporte...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reporte por Programa -->
+                <div id="programReport" class="report-content">
+                    <div class="report-filters">
+                        <select id="programReportFilter" class="filter-select">
+                            <option value="">Seleccionar Programa</option>
+                        </select>
+                        <button id="loadProgramReport" class="btn btn-primary">Cargar Reporte</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID Caso</th>
+                                    <th>Contribuyente</th>
+                                    <th>Auditor</th>
+                                    <th>Estado</th>
+                                    <th>Monto Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="programReportBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">Seleccione un programa y haga clic en "Cargar Reporte"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reporte de Auditores -->
+                <div id="auditorReport" class="report-content">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Auditor</th>
+                                    <th>Total Casos</th>
+                                    <th>Gestión Perceptiva</th>
+                                    <th>Activos</th>
+                                    <th>Cerrados</th>
+                                    <th>Monto Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditorReportBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Cargando reporte...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Usuarios -->
+            <div id="usersView" class="view">
+                <div class="view-header">
+                    <h2>Gestión de Usuarios</h2>
+                    <button id="addUserBtn" class="btn btn-primary">
+                        <span>➕</span> Nuevo Usuario
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Rol</th>
+                                <th>Fecha Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="4" class="text-center">Cargando usuarios...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Caso -->
+    <div id="caseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="caseModalTitle">Nuevo Caso</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="caseForm" class="modal-body">
+                <input type="hidden" id="caseId" name="id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="caseNit">NIT *</label>
+                        <input type="text" id="caseNit" name="nit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="caseTaxpayerName">Nombre Contribuyente *</label>
+                        <input type="text" id="caseTaxpayerName" name="taxpayer_name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="caseProgramCode">Programa *</label>
+                        <select id="caseProgramCode" name="program_code" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="caseTaxType">Tipo Impuesto *</label>
+                        <select id="caseTaxType" name="tax_type" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="caseOpeningYear">Año Apertura *</label>
+                        <input type="number" id="caseOpeningYear" name="opening_year" required min="2020" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label for="caseTaxableYear">Año Gravable *</label>
+                        <input type="number" id="caseTaxableYear" name="taxable_year" required min="2015" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label for="casePeriod">Período</label>
+                        <input type="text" id="casePeriod" name="period">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="caseAuditor">Auditor *</label>
+                        <select id="caseAuditor" name="auditor_id" required>
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="caseStatus">Estado *</label>
+                        <select id="caseStatus" name="status" required>
+                            <option value="Activo">Activo</option>
+                            <option value="En Curso">En Curso</option>
+                            <option value="En Notificación">En Notificación</option>
+                            <option value="Cerrado">Cerrado</option>
+                            <option value="Evacuado">Evacuado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="caseGestionPerceptiva" name="gestion_perceptiva">
+                        Gestión Perceptiva
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="caseNotes">Notas</label>
+                    <textarea id="caseNotes" name="notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Usuario -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Usuario</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="userForm" class="modal-body">
+                <div class="form-group">
+                    <label for="userUsername">Usuario *</label>
+                    <input type="text" id="userUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña *</label>
+                    <input type="password" id="userPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="userName">Nombre Completo *</label>
+                    <input type="text" id="userName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Rol *</label>
+                    <select id="userRole" name="role" required>
+                        <option value="auditor">Auditor</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
